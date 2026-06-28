@@ -1,0 +1,50 @@
+class AppStrings {
+  AppStrings._();
+
+  static const String appTitle = 'AAK';
+  static const String home = 'Home';
+  static const String projects = 'Projects';
+  static const String aboutMe = 'About Me';
+  static const String contact = 'Contact';
+  static const String userName = 'Awais Ahmad';
+  static const String userTitle = 'Software Developer';
+  static const String helloIAm = 'Hello I am';
+  static const String myResume = 'My Resume';
+  static const String specializedIn = 'Specialized In';
+  static const String getInTouch = 'Get In Touch';
+  static const String contactSubtitle = "Let's connect";
+  static const String whatsapp = 'WhatsApp';
+  static const String call = 'Call';
+  static const String message = 'Message';
+  static const String email = 'Email';
+  static const String openUrl = 'Open URL';
+  static const String cancel = 'Cancel';
+  static const String open = 'Open';
+  static const String sendEmail = 'Send Email';
+  static const String enterPhoneNumber = 'Enter Phone Number';
+  static const String enterEmailAddress = 'Enter Email Address';
+  static const String enterUrl = 'Enter URL';
+  static const String enterWhatsAppNumber = 'Enter WhatsApp Number';
+  static const String phoneHint = 'e.g. 923001234567';
+  static const String emailHint = 'e.g. example@gmail.com';
+  static const String urlHint = 'e.g. https://example.com';
+  static const String chatWithAwais = 'Do you want to chat with Awais?';
+  static const String callAwais = 'Do you want to call Awais?';
+  static const String messageAwais = 'Do you want to message Awais?';
+  static const String username = 'Kamyana786';
+  static const String couldNotOpen = 'Could not open';
+  static const String invalidInput = 'Invalid input';
+
+  static const String updateResume = 'Update Resume';
+  static const String previewResume = 'Preview Resume';
+  static const String downloadResume = 'Download Resume';
+  static const String shareResume = 'Share Resume';
+  static const String resumeUpdated = 'Resume updated successfully.';
+  static const String noResumeFound = 'No resume found. Please upload one first.';
+  static const String resumeFileNotFound = 'Resume file not found. Please upload again.';
+  static const String couldNotOpenResume = 'Could not open resume.';
+  static const String failedToUpdateResume = 'Failed to update resume.';
+  static const String resumeSection = 'Resume';
+  static const String footerCopyright = '© 2026 Awais Ahmad';
+  static const String footerCredit = 'Designed & Developed with Flutter ❤️';
+}

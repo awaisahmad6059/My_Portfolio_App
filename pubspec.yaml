@@ -1,0 +1,35 @@
+name: aak
+description: "Personal portfolio app for Awais Ahmad (AAK)"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  http: ^1.2.2
+  url_launcher: ^6.3.2
+  wtf_sliding_sheet: ^1.1.5
+  font_awesome_flutter: ^10.8.0
+  file_picker: ^8.0.0
+  open_filex: ^4.4.0
+  shared_preferences: ^2.3.0
+  share_plus: ^10.0.0
+  path_provider: ^2.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+  fonts:
+    - family: Soho
+      fonts:
+        - asset: fonts/soho.ttf
