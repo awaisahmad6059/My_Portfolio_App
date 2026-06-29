@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aak/core/routes/app_routes.dart';
 import 'package:aak/core/theme/app_theme.dart';
+import 'package:aak/screens/admin/admin_screen.dart';
 import 'package:aak/screens/main_shell.dart';
 import 'package:aak/screens/splash/splash_screen.dart';
 
@@ -33,6 +34,10 @@ class MyApp extends StatelessWidget {
                 );
               },
               transitionDuration: const Duration(milliseconds: 500),
+            );
+          case AppRoutes.admin:
+            return MaterialPageRoute(
+              builder: (_) => const AdminScreen(),
             );
           default:
             return null;

@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wtf_sliding_sheet/wtf_sliding_sheet.dart';
 import 'package:aak/core/constants/app_assets.dart';
 import 'package:aak/core/constants/app_colors.dart';
 import 'package:aak/core/constants/app_dimensions.dart';
 import 'package:aak/core/constants/app_strings.dart';
-import 'package:aak/core/constants/app_urls.dart';
+import 'package:aak/core/routes/app_routes.dart';
 import 'package:aak/core/utils/url_launcher_utils.dart';
+import 'package:aak/models/admin_data.dart';
+import 'package:aak/providers/admin_provider.dart';
 import 'package:aak/screens/home/home_widgets.dart';
+import 'package:aak/widgets/pin_dialog.dart';
 import 'package:aak/widgets/profile_image_widget.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   Future<void> _launch(BuildContext context, String url) async {
@@ -22,7 +26,7 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
-  void _showWhatsAppDialog(BuildContext context) {
+  void _showWhatsAppDialog(BuildContext context, String whatsappNumber) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -36,7 +40,7 @@ class HomeScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              _launch(context, '${AppUrls.waMe}${AppUrls.whatsappNumber}');
+              _launch(context, 'https://wa.me/$whatsappNumber');
             },
             child: const Text(AppStrings.open),
           ),
@@ -45,7 +49,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _showCallDialog(BuildContext context) {
+  void _showCallDialog(BuildContext context, String phoneNumber) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -59,7 +63,7 @@ class HomeScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              _launch(context, 'tel:${AppUrls.phoneNumber}');
+              _launch(context, 'tel:$phoneNumber');
             },
             child: const Text(AppStrings.call),
           ),
@@ -68,7 +72,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _showMessageDialog(BuildContext context) {
+  void _showMessageDialog(BuildContext context, String phoneNumber) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -82,7 +86,7 @@ class HomeScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              _launch(context, 'sms:${AppUrls.phoneNumber}');
+              _launch(context, 'sms:$phoneNumber');
             },
             child: const Text(AppStrings.message),
           ),
@@ -91,14 +95,28 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _onLongPress(BuildContext context) async {
+    final isAuthenticated = await showDialog<bool>(
+      context: context,
+      builder: (_) => const PinDialog(),
+    );
+    if (isAuthenticated == true && context.mounted) {
+      Navigator.of(context).pushNamed(AppRoutes.admin);
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final admin = ref.watch(adminDataProvider).valueOrNull ?? AdminData.defaults();
+    final customImage = ref.watch(adminImageProvider).valueOrNull;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.transparent,
+        automaticallyImplyLeading: false,
       ),
       body: SlidingSheet(
         elevation: 8,
@@ -116,18 +134,22 @@ class HomeScreen extends StatelessWidget {
             final buttonTop = constraints.maxHeight * 0.14;
             return Stack(
               children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 25),
-                  child: AnimatedProfileImage(
-                    imageAsset: AppAssets.profileImage,
-                    heroTag: 'profileImage',
-                    shaderMaskGradient: const LinearGradient(
-                      begin: Alignment.center,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColors.background,
-                        AppColors.transparent,
-                      ],
+                GestureDetector(
+                  onLongPress: () => _onLongPress(context),
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 25),
+                    child: AnimatedProfileImage(
+                      imageAsset: AppAssets.profileImage,
+                      heroTag: 'profileImage',
+                      customImageBytes: customImage,
+                      shaderMaskGradient: const LinearGradient(
+                        begin: Alignment.center,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.background,
+                          AppColors.transparent,
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -136,9 +158,9 @@ class HomeScreen extends StatelessWidget {
                   margin: EdgeInsets.only(top: nameOffset),
                   child: Column(
                     children: [
-                      const Text(
-                        AppStrings.userName,
-                        style: TextStyle(
+                      Text(
+                        admin.fullName,
+                        style: const TextStyle(
                           fontFamily: 'Soho',
                           color: AppColors.white,
                           fontSize: AppDimens.fontXxl,
@@ -146,9 +168,9 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      const Text(
-                        AppStrings.userTitle,
-                        style: TextStyle(
+                      Text(
+                        admin.jobTitle,
+                        style: const TextStyle(
                           fontFamily: 'Soho',
                           color: AppColors.white,
                           fontSize: AppDimens.fontLg,
@@ -164,23 +186,26 @@ class HomeScreen extends StatelessWidget {
                     buttons: [
                       SocialButton(
                         icon: FontAwesomeIcons.whatsapp,
-                        onPressed: () => _showWhatsAppDialog(context),
+                        onPressed: () =>
+                            _showWhatsAppDialog(context, admin.whatsappNumber),
                       ),
                       SocialButton(
                         icon: Icons.phone,
-                        onPressed: () => _showCallDialog(context),
+                        onPressed: () =>
+                            _showCallDialog(context, admin.phoneNumber),
                       ),
                       SocialButton(
                         icon: Icons.message,
-                        onPressed: () => _showMessageDialog(context),
+                        onPressed: () =>
+                            _showMessageDialog(context, admin.phoneNumber),
                       ),
                       SocialButton(
                         icon: FontAwesomeIcons.facebook,
-                        onPressed: () => _launch(context, AppUrls.facebook),
+                        onPressed: () => _launch(context, admin.facebookUrl),
                       ),
                       SocialButton(
                         icon: FontAwesomeIcons.threads,
-                        onPressed: () => _launch(context, AppUrls.threads),
+                        onPressed: () => _launch(context, admin.threadsUrl),
                       ),
                     ],
                   ),
@@ -192,24 +217,24 @@ class HomeScreen extends StatelessWidget {
                     buttons: [
                       SocialButton(
                         icon: FontAwesomeIcons.linkedin,
-                        onPressed: () => _launch(context, AppUrls.linkedin),
+                        onPressed: () => _launch(context, admin.linkedinUrl),
                       ),
                       SocialButton(
                         icon: FontAwesomeIcons.instagram,
-                        onPressed: () => _launch(context, AppUrls.instagram),
+                        onPressed: () => _launch(context, admin.instagramUrl),
                       ),
                       SocialButton(
                         icon: FontAwesomeIcons.snapchat,
-                        onPressed: () => _launch(context, AppUrls.snapchat),
+                        onPressed: () => _launch(context, admin.snapchatUrl),
                       ),
                       SocialButton(
                         icon: Icons.email,
                         onPressed: () =>
-                            _launch(context, 'mailto:${AppUrls.emailAddress}'),
+                            _launch(context, 'mailto:${admin.emailAddress}'),
                       ),
                       SocialButton(
                         icon: FontAwesomeIcons.github,
-                        onPressed: () => _launch(context, AppUrls.github),
+                        onPressed: () => _launch(context, admin.githubUrl),
                       ),
                     ],
                   ),

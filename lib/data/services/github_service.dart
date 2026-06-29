@@ -1,34 +1,30 @@
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class GithubService {
   static const String _baseUrl = 'https://api.github.com';
-  static const String _username = 'awaisahmad6059';
-
+  final String username;
   final http.Client _client;
 
-  GithubService({http.Client? client}) : _client = client ?? http.Client();
+  GithubService({required this.username, required http.Client client})
+      : _client = client;
 
-  static const Map<String, String> _headers = {
+  Map<String, String> get _headers => {
     'Accept': 'application/vnd.github.v3+json',
+    'User-Agent': 'AAK-Portfolio/1.0',
   };
 
   Future<http.Response> getUser() {
-    return _client.get(
-      Uri.parse('$_baseUrl/users/$_username'),
-      headers: _headers,
-    );
+    final uri = Uri.parse('$_baseUrl/users/$username');
+    debugPrint('[GithubService] GET $uri (username: $username)');
+    return _client.get(uri, headers: _headers);
   }
 
   Future<http.Response> getRepositories() {
-    return _client.get(
-      Uri.parse(
-        '$_baseUrl/users/$_username/repos?sort=updated&per_page=100&type=public',
-      ),
-      headers: _headers,
+    final uri = Uri.parse(
+      '$_baseUrl/users/$username/repos?sort=updated&per_page=100',
     );
-  }
-
-  void dispose() {
-    _client.close();
+    debugPrint('[GithubService] GET $uri (username: $username)');
+    return _client.get(uri, headers: _headers);
   }
 }

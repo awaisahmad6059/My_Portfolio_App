@@ -7,6 +7,8 @@ import 'package:aak/core/constants/app_dimensions.dart';
 import 'package:aak/core/constants/app_strings.dart';
 import 'package:aak/core/constants/app_urls.dart';
 import 'package:aak/core/utils/url_launcher_utils.dart';
+import 'package:aak/models/admin_data.dart';
+import 'package:aak/providers/admin_provider.dart';
 import 'package:aak/providers/resume_provider.dart';
 import 'package:aak/widgets/footer_widget.dart';
 import 'package:aak/widgets/shimmer_loading.dart';
@@ -184,6 +186,8 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
   @override
   Widget build(BuildContext context) {
     final resumeAsync = ref.watch(resumeDataProvider);
+    final admin = ref.watch(adminDataProvider).valueOrNull ?? AdminData.defaults();
+    final customImage = ref.watch(adminImageProvider).valueOrNull;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -191,6 +195,7 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.transparent,
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -206,8 +211,9 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
                   margin: const EdgeInsets.only(top: 40),
                   child: AnimatedProfileImage(
                     imageAsset: AppAssets.profileImage,
-                    heroTag: 'profileImage',
+                    heroTag: 'aboutImage',
                     height: imageHeight,
+                    customImageBytes: customImage,
                     shaderMaskGradient: const LinearGradient(
                       begin: Alignment.center,
                       end: Alignment.bottomCenter,
@@ -240,9 +246,9 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
                         const SizedBox(height: AppDimens.paddingSm + 2),
                         EntranceAnimation(
                           index: 1,
-                          child: const Text(
-                            AppStrings.userName,
-                            style: TextStyle(
+                          child: Text(
+                            admin.fullName,
+                            style: const TextStyle(
                               color: AppColors.white,
                               fontSize: AppDimens.fontXxl,
                               fontWeight: FontWeight.bold,
@@ -252,9 +258,9 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
                         const SizedBox(height: 2),
                         EntranceAnimation(
                           index: 2,
-                          child: const Text(
-                            AppStrings.userTitle,
-                            style: TextStyle(
+                          child: Text(
+                            admin.jobTitle,
+                            style: const TextStyle(
                               color: AppColors.white,
                               fontSize: AppDimens.fontLg,
                             ),
@@ -282,7 +288,7 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
                         const SizedBox(height: AppDimens.paddingXl),
                         EntranceAnimation(
                           index: 4,
-                          child: const AboutSocialIcons(),
+                          child: AboutSocialIcons(admin: admin),
                         ),
                         const SizedBox(height: AppDimens.paddingXl),
                         _buildResumeSection(resumeAsync),

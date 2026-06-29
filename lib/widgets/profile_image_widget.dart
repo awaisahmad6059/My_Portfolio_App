@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:aak/core/constants/app_colors.dart';
 import 'package:aak/core/constants/app_dimensions.dart';
@@ -7,6 +8,7 @@ class AnimatedProfileImage extends StatefulWidget {
   final double height;
   final String heroTag;
   final Gradient? shaderMaskGradient;
+  final Uint8List? customImageBytes;
 
   const AnimatedProfileImage({
     super.key,
@@ -14,6 +16,7 @@ class AnimatedProfileImage extends StatefulWidget {
     this.height = 400,
     required this.heroTag,
     this.shaderMaskGradient,
+    this.customImageBytes,
   });
 
   @override
@@ -62,12 +65,19 @@ class _AnimatedProfileImageState extends State<AnimatedProfileImage>
     Widget imageContent = ClipRRect(
       borderRadius:
           const BorderRadius.all(Radius.circular(AppDimens.radiusSmall)),
-      child: Image.asset(
-        widget.imageAsset,
-        height: widget.height,
-        width: double.infinity,
-        fit: BoxFit.cover,
-      ),
+      child: widget.customImageBytes != null
+          ? Image.memory(
+              widget.customImageBytes!,
+              height: widget.height,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            )
+          : Image.asset(
+              widget.imageAsset,
+              height: widget.height,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
     );
 
     if (widget.shaderMaskGradient != null) {
@@ -119,22 +129,31 @@ class ProfileImageWidget extends StatelessWidget {
   final String imageAsset;
   final double height;
   final Gradient? shaderMaskGradient;
+  final Uint8List? customImageBytes;
 
   const ProfileImageWidget({
     super.key,
     required this.imageAsset,
     this.height = 400,
     this.shaderMaskGradient,
+    this.customImageBytes,
   });
 
   @override
   Widget build(BuildContext context) {
-    Widget image = Image.asset(
-      imageAsset,
-      height: height,
-      width: double.infinity,
-      fit: BoxFit.cover,
-    );
+    Widget image = customImageBytes != null
+        ? Image.memory(
+            customImageBytes!,
+            height: height,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          )
+        : Image.asset(
+            imageAsset,
+            height: height,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          );
 
     if (shaderMaskGradient != null) {
       image = ShaderMask(

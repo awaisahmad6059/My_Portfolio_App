@@ -10,12 +10,22 @@ import 'package:aak/widgets/entrance_animation.dart';
 class ProjectsScreen extends ConsumerWidget {
   const ProjectsScreen({super.key});
 
+  static String _friendlyError(Object error) {
+    final msg = error.toString();
+    if (msg.contains('403')) return 'Rate limit reached or access denied. Try again later.';
+    if (msg.contains('404')) return 'User not found. Check GitHub username in Admin Panel.';
+    if (msg.contains('XMLHttpRequest')) return 'Network error. Check your connection or CORS settings.';
+    if (msg.contains('Failed to load')) return 'Could not reach GitHub API. Check your internet connection.';
+    return msg;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final reposAsync = ref.watch(githubReposProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           AppStrings.projects,
           style: TextStyle(color: AppColors.white),
@@ -75,7 +85,7 @@ class ProjectsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppDimens.paddingSm),
                 Text(
-                  error.toString(),
+                  _friendlyError(error),
                   style: const TextStyle(
                     color: AppColors.grey,
                     fontSize: AppDimens.fontSm,
@@ -86,6 +96,17 @@ class ProjectsScreen extends ConsumerWidget {
                 FilledButton.tonal(
                   onPressed: () => ref.invalidate(githubReposProvider),
                   child: const Text('Retry'),
+                ),
+                const SizedBox(height: AppDimens.paddingSm),
+                TextButton(
+                  onPressed: () {
+                    ref.invalidate(githubRepositoryProvider);
+                    ref.invalidate(githubReposProvider);
+                  },
+                  child: const Text(
+                    'Clear cache & retry',
+                    style: TextStyle(color: AppColors.grey, fontSize: 12),
+                  ),
                 ),
               ],
             ),

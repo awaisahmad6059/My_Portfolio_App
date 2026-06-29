@@ -47,4 +47,38 @@ class AppStrings {
   static const String resumeSection = 'Resume';
   static const String footerCopyright = '© 2026 Awais Ahmad';
   static const String footerCredit = 'Designed & Developed with Flutter ❤️';
+
+  // Admin Panel
+  static const String adminPanel = 'Admin Panel';
+  static const String adminPinTitle = 'Admin Access';
+  static const String adminPinHint = 'Enter PIN';
+  static const String adminPinInvalid = 'Invalid PIN';
+  static const String adminPinSubmit = 'Submit';
+  static const String adminSave = 'Save Changes';
+  static const String adminSaved = 'Changes saved successfully.';
+  static const String adminProfileSection = 'Profile Information';
+  static const String adminContactSection = 'Contact Information';
+  static const String adminImageSection = 'Profile Image';
+  static const String adminSocialSection = 'Social Links';
+  static const String adminGithubSection = 'GitHub';
+  static const String adminPickImage = 'Pick from Gallery';
+  static const String adminRestoreImage = 'Restore Default';
+  static const String adminImagePicked = 'Image updated. Save changes to persist.';
+  static const String adminImageRestored = 'Default image restored. Save changes to persist.';
+  static const String adminFullName = 'Full Name';
+  static const String adminJobTitle = 'Job Title';
+  static const String adminAboutMe = 'About Me';
+  static const String adminBio = 'Bio';
+  static const String adminLocation = 'Location';
+  static const String adminEmail = 'Email';
+  static const String adminPhone = 'Phone';
+  static const String adminGithubUsername = 'GitHub Username';
+  static const String adminGithubUrl = 'GitHub URL';
+  static const String adminLinkedinUrl = 'LinkedIn URL';
+  static const String adminFacebookUrl = 'Facebook URL';
+  static const String adminInstagramUrl = 'Instagram URL';
+  static const String adminThreadsUrl = 'Threads URL';
+  static const String adminSnapchatUrl = 'Snapchat URL';
+  static const String adminWhatsappChannelUrl = 'WhatsApp Channel URL';
+  static const String adminWhatsappNumber = 'WhatsApp Number';
 }

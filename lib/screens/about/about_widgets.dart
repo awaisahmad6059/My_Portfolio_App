@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:aak/core/constants/app_urls.dart';
 import 'package:aak/core/constants/app_colors.dart';
 import 'package:aak/core/constants/app_dimensions.dart';
 import 'package:aak/core/utils/url_launcher_utils.dart';
+import 'package:aak/models/admin_data.dart';
 
 class AboutSocialIcon extends StatelessWidget {
   final IconData icon;
@@ -18,7 +18,7 @@ class AboutSocialIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () => UrlLauncherUtils.tryLaunch(url),
+      onPressed: url.isNotEmpty ? () => UrlLauncherUtils.tryLaunch(url) : null,
       icon: Icon(icon, color: AppColors.white, size: AppDimens.iconMedium),
       splashRadius: 24,
       tooltip: url,
@@ -27,7 +27,9 @@ class AboutSocialIcon extends StatelessWidget {
 }
 
 class AboutSocialIcons extends StatelessWidget {
-  const AboutSocialIcons({super.key});
+  final AdminData admin;
+
+  const AboutSocialIcons({super.key, required this.admin});
 
   @override
   Widget build(BuildContext context) {
@@ -35,34 +37,34 @@ class AboutSocialIcons extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       alignment: WrapAlignment.center,
-      children: const [
+      children: [
         AboutSocialIcon(
           icon: FontAwesomeIcons.instagram,
-          url: AppUrls.instagram,
+          url: admin.instagramUrl,
         ),
         AboutSocialIcon(
           icon: FontAwesomeIcons.linkedin,
-          url: AppUrls.linkedin,
+          url: admin.linkedinUrl,
         ),
         AboutSocialIcon(
           icon: FontAwesomeIcons.github,
-          url: AppUrls.github,
+          url: admin.githubUrl,
         ),
         AboutSocialIcon(
           icon: FontAwesomeIcons.threads,
-          url: AppUrls.threads,
+          url: admin.threadsUrl,
         ),
         AboutSocialIcon(
           icon: FontAwesomeIcons.facebook,
-          url: AppUrls.facebook,
+          url: admin.facebookUrl,
         ),
         AboutSocialIcon(
           icon: FontAwesomeIcons.whatsapp,
-          url: AppUrls.whatsappChannel,
+          url: admin.whatsappChannelUrl,
         ),
         AboutSocialIcon(
           icon: FontAwesomeIcons.snapchat,
-          url: AppUrls.snapchat,
+          url: admin.snapchatUrl,
         ),
       ],
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wtf_sliding_sheet/wtf_sliding_sheet.dart';
 import 'package:aak/core/constants/app_assets.dart';
@@ -7,11 +8,12 @@ import 'package:aak/core/constants/app_dimensions.dart';
 import 'package:aak/core/constants/app_strings.dart';
 import 'package:aak/core/utils/url_launcher_utils.dart';
 import 'package:aak/core/utils/validators.dart';
+import 'package:aak/providers/admin_provider.dart';
 import 'package:aak/screens/contact/contact_widgets.dart';
 import 'package:aak/widgets/entrance_animation.dart';
 import 'package:aak/widgets/profile_image_widget.dart';
 
-class ContactScreen extends StatelessWidget {
+class ContactScreen extends ConsumerWidget {
   const ContactScreen({super.key});
 
   Future<String?> _showInputDialog(
@@ -88,13 +90,16 @@ class ContactScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final customImage = ref.watch(adminImageProvider).valueOrNull;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.transparent,
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: SlidingSheet(
@@ -110,6 +115,7 @@ class ContactScreen extends StatelessWidget {
             child: AnimatedProfileImage(
               imageAsset: AppAssets.profileImage,
               heroTag: 'contactImage',
+              customImageBytes: customImage,
               shaderMaskGradient: const LinearGradient(
                 begin: Alignment.center,
                 end: Alignment.bottomCenter,
