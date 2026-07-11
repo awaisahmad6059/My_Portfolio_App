@@ -10,7 +10,6 @@ import 'package:aak/core/utils/url_launcher_utils.dart';
 import 'package:aak/models/admin_data.dart';
 import 'package:aak/providers/admin_provider.dart';
 import 'package:aak/providers/resume_provider.dart';
-import 'package:aak/widgets/footer_widget.dart';
 import 'package:aak/widgets/shimmer_loading.dart';
 import 'package:aak/screens/about/about_widgets.dart';
 import 'package:aak/widgets/entrance_animation.dart';
@@ -293,8 +292,27 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
                         const SizedBox(height: AppDimens.paddingXl),
                         _buildResumeSection(resumeAsync),
                         const SizedBox(height: AppDimens.paddingLg),
-                        FooterWidget(
-                          onNavigateToTab: widget.onNavigateToTab,
+                        EntranceAnimation(
+                          index: 6,
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                            child: Column(
+                              children: [
+                                const Text(
+                                  '© 2026 Awais Ahmad',
+                                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'Designed & Developed with AAK ❤️',
+                                  style: TextStyle(color: Colors.grey, fontSize: 11),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                         const SizedBox(height: AppDimens.paddingMd),
                       ],

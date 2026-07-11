@@ -33,6 +33,17 @@ class GithubRepoModel {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'description': description,
+    'language': language,
+    'stargazers_count': stars,
+    'forks_count': forks,
+    'updated_at': updatedAt.toIso8601String(),
+    'visibility': visibility,
+    'html_url': htmlUrl,
+  };
+
   String get updatedAtFormatted {
     final now = DateTime.now();
     final diff = now.difference(updatedAt);

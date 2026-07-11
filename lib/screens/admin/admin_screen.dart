@@ -7,6 +7,7 @@ import 'package:aak/core/constants/app_dimensions.dart';
 import 'package:aak/models/admin_data.dart';
 import 'package:aak/providers/admin_provider.dart';
 import 'package:aak/providers/github_provider.dart';
+import 'package:aak/data/repositories/github_cache_repository.dart';
 
 class AdminScreen extends ConsumerStatefulWidget {
   const AdminScreen({super.key});
@@ -26,6 +27,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
   late TextEditingController _githubUsernameController;
+  late TextEditingController _githubTokenController;
   late TextEditingController _githubUrlController;
   late TextEditingController _linkedinUrlController;
   late TextEditingController _facebookUrlController;
@@ -36,6 +38,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
   late TextEditingController _whatsappNumberController;
 
   bool _isSaving = false;
+  bool _isSyncingGitHub = false;
 
   @override
   void initState() {
@@ -48,6 +51,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
     _emailController = TextEditingController();
     _phoneController = TextEditingController();
     _githubUsernameController = TextEditingController();
+    _githubTokenController = TextEditingController();
     _githubUrlController = TextEditingController();
     _linkedinUrlController = TextEditingController();
     _facebookUrlController = TextEditingController();
@@ -68,6 +72,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _githubUsernameController.dispose();
+    _githubTokenController.dispose();
     _githubUrlController.dispose();
     _linkedinUrlController.dispose();
     _facebookUrlController.dispose();
@@ -88,6 +93,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
     _emailController.text = data.email;
     _phoneController.text = data.phone;
     _githubUsernameController.text = data.githubUsername;
+    _githubTokenController.text = data.githubToken;
     _githubUrlController.text = data.githubUrl;
     _linkedinUrlController.text = data.linkedinUrl;
     _facebookUrlController.text = data.facebookUrl;
@@ -96,6 +102,32 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
     _snapchatUrlController.text = data.snapchatUrl;
     _whatsappChannelUrlController.text = data.whatsappChannelUrl;
     _whatsappNumberController.text = data.whatsappNumber;
+  }
+
+  Future<void> _syncGitHubRepos() async {
+    setState(() => _isSyncingGitHub = true);
+    try {
+      final repo = ref.read(githubRepositoryProvider);
+      final cache = GithubCacheRepository();
+      await cache.clear();
+      final repos = await repo.getRepositories();
+      final user = await repo.getUser();
+      await cache.saveRepos(repos);
+      await cache.saveUser(user);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Synced ${repos.length} repos successfully!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sync failed: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSyncingGitHub = false);
+    }
   }
 
   Future<void> _pickImage() async {
@@ -134,6 +166,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
       email: _emailController.text.trim(),
       phone: _phoneController.text.trim(),
       githubUsername: _githubUsernameController.text.trim(),
+      githubToken: _githubTokenController.text.trim(),
       githubUrl: _githubUrlController.text.trim(),
       linkedinUrl: _linkedinUrlController.text.trim(),
       facebookUrl: _facebookUrlController.text.trim(),
@@ -150,16 +183,18 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
       final repo = ref.read(adminRepositoryProvider);
       await repo.saveData(adminData);
 
-      // Update cached GitHub username immediately so downstream providers
+      // Update cached GitHub credentials immediately so downstream providers
       // pick up the new value without waiting for adminDataProvider to reload.
       ref.read(githubUsernameProvider.notifier).state =
           adminData.githubUsername;
+      ref.read(githubTokenProvider.notifier).state =
+          adminData.githubToken;
 
       // Invalidate adminDataProvider so it reloads from SharedPreferences.
       ref.invalidate(adminDataProvider);
 
       // Force-refresh all GitHub providers so home stats and project repos
-      // update immediately with the new username.
+      // update immediately with the new credentials.
       ref.invalidate(githubServiceProvider);
       ref.invalidate(githubRepositoryProvider);
       ref.invalidate(githubUserProvider);
@@ -323,6 +358,31 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
               _SectionHeader(AppStrings.adminGithubSection),
               _buildTextField(
                   _githubUsernameController, AppStrings.adminGithubUsername),
+              const SizedBox(height: AppDimens.paddingSm),
+              _buildTextField(
+                  _githubTokenController, 'GitHub Token (optional)',
+                  maxLines: 1,
+                  keyboardType: TextInputType.visiblePassword),
+              const SizedBox(height: AppDimens.paddingSm),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _isSyncingGitHub ? null : _syncGitHubRepos,
+                  icon: _isSyncingGitHub
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.sync, size: 18),
+                  label: Text(
+                      _isSyncingGitHub ? 'Syncing...' : 'Sync GitHub Repos Now'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.white,
+                    side: const BorderSide(color: AppColors.white70),
+                  ),
+                ),
+              ),
               const SizedBox(height: AppDimens.paddingLg),
               SizedBox(
                 width: double.infinity,

@@ -4,15 +4,22 @@ import 'package:http/http.dart' as http;
 class GithubService {
   static const String _baseUrl = 'https://api.github.com';
   final String username;
+  final String token;
   final http.Client _client;
 
-  GithubService({required this.username, required http.Client client})
+  GithubService({required this.username, this.token = '', required http.Client client})
       : _client = client;
 
-  Map<String, String> get _headers => {
-    'Accept': 'application/vnd.github.v3+json',
-    'User-Agent': 'AAK-Portfolio/1.0',
-  };
+  Map<String, String> get _headers {
+    final headers = <String, String>{
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'AAK-Portfolio/1.0',
+    };
+    if (token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    return headers;
+  }
 
   Future<http.Response> getUser() {
     final uri = Uri.parse('$_baseUrl/users/$username');

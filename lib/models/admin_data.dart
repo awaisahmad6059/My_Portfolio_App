@@ -11,6 +11,7 @@ class AdminData {
   final String phone;
   final String? customImagePath;
   final String githubUsername;
+  final String githubToken;
   final String githubUrl;
   final String linkedinUrl;
   final String facebookUrl;
@@ -31,6 +32,7 @@ class AdminData {
     required this.email,
     required this.phone,
     this.customImagePath,
+    this.githubToken = '',
     required this.githubUsername,
     required this.githubUrl,
     required this.linkedinUrl,
@@ -51,6 +53,7 @@ class AdminData {
       email: AppUrls.emailAddress,
       phone: AppUrls.phoneNumber,
       githubUsername: 'awaisahmad6059',
+      githubToken: '',
       githubUrl: AppUrls.github,
       linkedinUrl: AppUrls.linkedin,
       facebookUrl: AppUrls.facebook,
@@ -66,7 +69,7 @@ class AdminData {
 
   AdminData copyWith({String? fullName, String? jobTitle, String? aboutMe,
     String? bio, String? location, String? email, String? phone,
-    String? customImagePath, String? githubUsername, String? githubUrl,
+    String? customImagePath, String? githubUsername, String? githubToken, String? githubUrl,
     String? linkedinUrl, String? facebookUrl, String? instagramUrl,
     String? threadsUrl, String? snapchatUrl, String? whatsappChannelUrl,
     String? whatsappNumber, String? phoneNumber, String? emailAddress}) {
@@ -80,6 +83,7 @@ class AdminData {
       phone: phone ?? this.phone,
       customImagePath: customImagePath,
       githubUsername: githubUsername ?? this.githubUsername,
+      githubToken: githubToken ?? this.githubToken,
       githubUrl: githubUrl ?? this.githubUrl,
       linkedinUrl: linkedinUrl ?? this.linkedinUrl,
       facebookUrl: facebookUrl ?? this.facebookUrl,
@@ -103,6 +107,7 @@ class AdminData {
     'phone': phone,
     'customImagePath': customImagePath,
     'githubUsername': githubUsername,
+    'githubToken': githubToken,
     'githubUrl': githubUrl,
     'linkedinUrl': linkedinUrl,
     'facebookUrl': facebookUrl,
@@ -127,6 +132,7 @@ class AdminData {
       phone: json['phone'] as String? ?? defaults.phone,
       customImagePath: json['customImagePath'] as String?,
       githubUsername: json['githubUsername'] as String? ?? defaults.githubUsername,
+      githubToken: json['githubToken'] as String? ?? defaults.githubToken,
       githubUrl: json['githubUrl'] as String? ?? defaults.githubUrl,
       linkedinUrl: json['linkedinUrl'] as String? ?? defaults.linkedinUrl,
       facebookUrl: json['facebookUrl'] as String? ?? defaults.facebookUrl,

@@ -19,4 +19,11 @@ class GithubUserModel {
       following: json['following'] as int? ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'login': login,
+    'public_repos': publicRepos,
+    'followers': followers,
+    'following': following,
+  };
 }

@@ -19,21 +19,33 @@ final githubUsernameProvider = StateProvider<String>((ref) {
   return AdminData.defaults().githubUsername;
 });
 
+final githubTokenProvider = StateProvider<String>((ref) {
+  return AdminData.defaults().githubToken;
+});
+
 final githubServiceProvider = Provider<GithubService>((ref) {
   final adminData = ref.watch(adminDataProvider).valueOrNull;
-  final cached = ref.watch(githubUsernameProvider);
+  final cachedUser = ref.watch(githubUsernameProvider);
+  final cachedToken = ref.watch(githubTokenProvider);
 
   final username = adminData?.githubUsername;
+  final token = adminData?.githubToken;
   final effective = (username != null && username.isNotEmpty)
       ? username
-      : cached;
+      : cachedUser;
+  final effectiveToken = (token != null && token.isNotEmpty)
+      ? token
+      : cachedToken;
 
-  if (username != null && username.isNotEmpty && username != cached) {
+  if (username != null && username.isNotEmpty && username != cachedUser) {
     ref.read(githubUsernameProvider.notifier).state = username;
+  }
+  if (token != null && token.isNotEmpty && token != cachedToken) {
+    ref.read(githubTokenProvider.notifier).state = token;
   }
 
   final client = ref.read(httpClientProvider);
-  return GithubService(username: effective, client: client);
+  return GithubService(username: effective, token: effectiveToken, client: client);
 });
 
 final githubRepositoryProvider = Provider<GithubRepository>((ref) {

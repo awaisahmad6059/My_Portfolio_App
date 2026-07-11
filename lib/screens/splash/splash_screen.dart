@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:aak/core/constants/app_assets.dart';
 import 'package:aak/core/constants/app_colors.dart';
@@ -21,25 +22,24 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1500),
     );
     _animation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
     );
     _controller.forward();
-    _controller.addStatusListener(_onAnimationStatus);
+    Timer(const Duration(seconds: 3), _navigateToHome);
   }
 
-  void _onAnimationStatus(AnimationStatus status) {
-    if (status == AnimationStatus.completed && mounted) {
+  void _navigateToHome() {
+    if (mounted) {
       Navigator.of(context).pushReplacementNamed(AppRoutes.home);
     }
   }
 
   @override
   void dispose() {
-    _controller.removeStatusListener(_onAnimationStatus);
     _controller.dispose();
     super.dispose();
   }

@@ -2,13 +2,16 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:aak/data/services/github_service.dart';
+import 'package:aak/data/repositories/github_cache_repository.dart';
 import 'package:aak/models/github_repo_model.dart';
 import 'package:aak/models/github_user_model.dart';
 
 class GithubRepository {
   final GithubService _service;
+  final GithubCacheRepository _cache;
 
-  GithubRepository(this._service);
+  GithubRepository(this._service, {GithubCacheRepository? cache})
+      : _cache = cache ?? GithubCacheRepository();
 
   List<GithubRepoModel>? _cachedRepos;
   GithubUserModel? _cachedUser;
@@ -40,20 +43,30 @@ class GithubRepository {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       _cachedUser = GithubUserModel.fromJson(json);
       _lastFetchTime = DateTime.now();
+      _cache.saveUser(_cachedUser!);
       debugPrint('[GithubRepository] User parsed: ${_cachedUser!.login} (${_cachedUser!.publicRepos} repos, ${_cachedUser!.followers} followers)');
       return _cachedUser!;
     }
 
     if (response.statusCode == 404) {
       debugPrint('[GithubRepository] User not found (404)');
+      final cached = await _cache.loadUser();
+      if (cached != null) return cached;
       throw GithubApiException('User not found', 404);
     }
     if (response.statusCode == 403) {
-      debugPrint('[GithubRepository] Rate limited (403)');
-      throw GithubApiException('Rate limit reached', 403);
+      debugPrint('[GithubRepository] Rate limited (403) — trying cache');
+      final cached = await _cache.loadUser();
+      if (cached != null) {
+        debugPrint('[GithubRepository] Returning cached user: ${cached.login}');
+        return cached;
+      }
+      throw GithubApiException('Rate limit reached. Add a GitHub token in Admin Panel or try again later.', 403);
     }
 
     if (_cachedUser != null) return _cachedUser!;
+    final cached = await _cache.loadUser();
+    if (cached != null) return cached;
     throw GithubApiException(
       'Failed to load user data (${response.statusCode})',
       response.statusCode,
@@ -85,20 +98,30 @@ class GithubRepository {
           .where((repo) => !repo.name.contains(RegExp(r'^\.')))
           .toList();
       _lastFetchTime = DateTime.now();
+      _cache.saveRepos(_cachedRepos!);
       debugPrint('[GithubRepository] Loaded ${_cachedRepos!.length} repos');
       return _cachedRepos!;
     }
 
     if (response.statusCode == 404) {
       debugPrint('[GithubRepository] User not found (404)');
+      final cached = await _cache.loadRepos();
+      if (cached != null && cached.isNotEmpty) return cached;
       throw GithubApiException('User not found', 404);
     }
     if (response.statusCode == 403) {
-      debugPrint('[GithubRepository] Rate limited (403)');
-      throw GithubApiException('Rate limit reached', 403);
+      debugPrint('[GithubRepository] Rate limited (403) — trying cache');
+      final cached = await _cache.loadRepos();
+      if (cached != null && cached.isNotEmpty) {
+        debugPrint('[GithubRepository] Returning ${cached.length} cached repos');
+        return cached;
+      }
+      throw GithubApiException('Rate limit reached. Add a GitHub token in Admin Panel or try again later.', 403);
     }
 
     if (_cachedRepos != null) return _cachedRepos!;
+    final cached = await _cache.loadRepos();
+    if (cached != null && cached.isNotEmpty) return cached;
     throw GithubApiException(
       'Failed to load repositories (${response.statusCode})',
       response.statusCode,
