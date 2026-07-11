@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aak/core/constants/app_colors.dart';
@@ -7,12 +8,43 @@ import 'package:aak/providers/github_provider.dart';
 import 'package:aak/screens/projects/project_card.dart';
 import 'package:aak/widgets/entrance_animation.dart';
 
-class ProjectsScreen extends ConsumerWidget {
+class ProjectsScreen extends ConsumerStatefulWidget {
   const ProjectsScreen({super.key});
+
+  @override
+  ConsumerState<ProjectsScreen> createState() => _ProjectsScreenState();
+}
+
+class _ProjectsScreenState extends ConsumerState<ProjectsScreen>
+    with WidgetsBindingObserver {
+  Timer? _autoRefreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _autoRefreshTimer = Timer.periodic(const Duration(minutes: 3), (_) {
+      ref.invalidate(githubReposProvider);
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoRefreshTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.invalidate(githubReposProvider);
+    }
+  }
 
   static String _friendlyError(Object error) {
     final msg = error.toString();
-    if (msg.contains('403')) return 'Rate limit reached or access denied. Try again later.';
+    if (msg.contains('403')) return 'Rate limit reached or access denied. Add a GitHub token in Admin Panel.';
     if (msg.contains('404')) return 'User not found. Check GitHub username in Admin Panel.';
     if (msg.contains('XMLHttpRequest')) return 'Network error. Check your connection or CORS settings.';
     if (msg.contains('Failed to load')) return 'Could not reach GitHub API. Check your internet connection.';
@@ -20,7 +52,7 @@ class ProjectsScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final reposAsync = ref.watch(githubReposProvider);
     return Scaffold(
       backgroundColor: AppColors.background,

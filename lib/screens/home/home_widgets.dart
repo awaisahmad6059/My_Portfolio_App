@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aak/core/constants/app_colors.dart';
@@ -122,11 +123,28 @@ class StatItem extends StatelessWidget {
   }
 }
 
-class StatsSection extends ConsumerWidget {
+class StatsSection extends ConsumerStatefulWidget {
   const StatsSection({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StatsSection> createState() => _StatsSectionState();
+}
+
+class _StatsSectionState extends ConsumerState<StatsSection> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => _startAutoRefresh());
+  }
+
+  void _startAutoRefresh() {
+    Timer.periodic(const Duration(minutes: 3), (_) {
+      if (mounted) ref.invalidate(githubUserProvider);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final userAsync = ref.watch(githubUserProvider);
     return userAsync.when(
       data: (user) => EntranceFade(

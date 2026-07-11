@@ -108,10 +108,10 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
     setState(() => _isSyncingGitHub = true);
     try {
       final repo = ref.read(githubRepositoryProvider);
-      final cache = GithubCacheRepository();
-      await cache.clear();
       final repos = await repo.getRepositories();
       final user = await repo.getUser();
+      final cache = GithubCacheRepository();
+      await cache.clear();
       await cache.saveRepos(repos);
       await cache.saveUser(user);
       if (mounted) {
