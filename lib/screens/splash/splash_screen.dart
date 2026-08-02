@@ -16,6 +16,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
+  Timer? _navigateTimer;
 
   @override
   void initState() {
@@ -29,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen>
       curve: Curves.easeInOut,
     );
     _controller.forward();
-    Timer(const Duration(seconds: 3), _navigateToHome);
+    _navigateTimer = Timer(const Duration(seconds: 3), _navigateToHome);
   }
 
   void _navigateToHome() {
@@ -40,6 +41,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
+    _navigateTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }

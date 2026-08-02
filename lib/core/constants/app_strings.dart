@@ -6,6 +6,7 @@ class AppStrings {
   static const String projects = 'Projects';
   static const String aboutMe = 'About Me';
   static const String contact = 'Contact';
+  static const String aiChat = 'AI';
   static const String userName = 'Awais Ahmad';
   static const String userTitle = 'Software Developer';
   static const String helloIAm = 'Hello I am';

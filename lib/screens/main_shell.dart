@@ -6,6 +6,7 @@ import 'package:aak/screens/home/home_screen.dart';
 import 'package:aak/screens/projects/projects_screen.dart';
 import 'package:aak/screens/about/about_screen.dart';
 import 'package:aak/screens/contact/contact_screen.dart';
+import 'package:aak/screens/chat/chat_screen.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -22,6 +23,7 @@ class _MainShellState extends State<MainShell> {
     const ProjectsScreen(),
     AboutScreen(onNavigateToTab: (index) => setState(() => _currentIndex = index)),
     const ContactScreen(),
+    const ChatScreen(),
   ];
 
   @override
@@ -59,7 +61,7 @@ class _MainShellState extends State<MainShell> {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(4, (index) {
+              children: List.generate(_icons.length, (index) {
                 final isSelected = _currentIndex == index;
                 return _NavItem(
                   icon: _icons[index],
@@ -80,6 +82,7 @@ class _MainShellState extends State<MainShell> {
     Icons.code,
     Icons.person,
     Icons.contacts,
+    Icons.smart_toy,
   ];
 
   static const List<String> _labels = [
@@ -87,6 +90,7 @@ class _MainShellState extends State<MainShell> {
     AppStrings.projects,
     AppStrings.aboutMe,
     AppStrings.contact,
+    AppStrings.aiChat,
   ];
 }
 
